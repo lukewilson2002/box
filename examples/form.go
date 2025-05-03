@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fivemoreminix/dos"
 	"github.com/fivemoreminix/box"
 	"github.com/gdamore/tcell/v2"
 )
