@@ -1,11 +1,8 @@
-//go:build ignore
-// +build ignore
-
 package main
 
 import (
 	"fmt"
-	"github.com/fivemoreminix/dos"
+	"github.com/fivemoreminix/box"
 	"github.com/gdamore/tcell/v2"
 	"os"
 )
@@ -20,15 +17,15 @@ func main() {
 	}
 
 	// Here we construct the GUI
-	widget := &dos.Center{
-		Child: &dos.Label{
+	widget := &box.Center{
+		Child: &box.Label{
 			Text:  "Hello, world!\nTry resizing the screen!",
 			Style: tcell.StyleDefault.Foreground(tcell.ColorRed),
 		},
 	}
 
-	var app dos.App
-	app = dos.App{
+	var app box.App
+	app = box.App{
 		MainWidget: widget,
 		OnKeyEvent: func(ev *tcell.EventKey) bool {
 			if ev.Key() == tcell.KeyEsc {

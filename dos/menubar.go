@@ -2,6 +2,7 @@ package dos
 
 import (
 	"fmt"
+	"github.com/fivemoreminix/box"
 	"github.com/gdamore/tcell/v2"
 	"github.com/mattn/go-runewidth"
 )
@@ -24,19 +25,19 @@ type MenuBar struct {
 // ItemRects returns a slice of Rects for each Menu's title that the user
 // selects before expanding the actual Menu. The returned slice length will be
 // equal to the length of Menus.
-func (m *MenuBar) ItemRects(rect Rect) []Rect {
+func (m *MenuBar) ItemRects(rect box.Rect) []box.Rect {
 	// TODO: MenuBar ItemRects() may need to be optimized by removing the allocation
-	rects := make([]Rect, len(m.Menus))
+	rects := make([]box.Rect, len(m.Menus))
 	col := 1
 	for i := 0; i < len(m.Menus); i++ {
 		textWidth := runewidth.StringWidth(m.Menus[i].Title)
-		rects[i] = Rect{rect.X + col, rect.Y, textWidth + 2, 1}
+		rects[i] = box.Rect{rect.X + col, rect.Y, textWidth + 2, 1}
 		col += textWidth + 2
 	}
 	return rects
 }
 
-func (m *MenuBar) HandleMouse(currentRect Rect, ev *tcell.EventMouse) bool {
+func (m *MenuBar) HandleMouse(currentRect box.Rect, ev *tcell.EventMouse) bool {
 	rects := m.ItemRects(currentRect)
 	if ev.Buttons()&tcell.ButtonPrimary != 0 {
 		for i := 0; i < len(rects); i++ {
@@ -49,7 +50,7 @@ func (m *MenuBar) HandleMouse(currentRect Rect, ev *tcell.EventMouse) bool {
 		}
 	}
 	if m.expanded && len(m.Menus) > 0 {
-		rect := Rect{rects[m.Selected].X, rects[m.Selected].Y + 1, currentRect.W, currentRect.H}
+		rect := box.Rect{rects[m.Selected].X, rects[m.Selected].Y + 1, currentRect.W, currentRect.H}
 		m.Menus[m.Selected].HandleMouse(rect, ev)
 	}
 	return false
@@ -102,7 +103,7 @@ func (m *MenuBar) DisplaySize(boundsW, _ int) (w, h int) {
 	return boundsW, 1
 }
 
-func (m *MenuBar) Draw(rect Rect, s tcell.Screen) {
+func (m *MenuBar) Draw(rect box.Rect, s tcell.Screen) {
 	for col := 0; col < rect.W; col++ {
 		s.SetContent(rect.X+col, rect.Y, ' ', nil, m.NormalStyle)
 	}
@@ -115,10 +116,10 @@ func (m *MenuBar) Draw(rect Rect, s tcell.Screen) {
 
 				if m.expanded { // If the selected menu is also expanded
 					menuW, menuH := m.Menus[i].DisplaySize(0, 0)
-					m.Menus[i].Draw(Rect{r.X, r.Y + 1, menuW, menuH}, s)
+					m.Menus[i].Draw(box.Rect{r.X, r.Y + 1, menuW, menuH}, s)
 				}
 			}
-			DrawString(r.X, r.Y, fmt.Sprintf(" %s ", m.Menus[i].Title), style, s)
+			box.DrawString(r.X, r.Y, fmt.Sprintf(" %s ", m.Menus[i].Title), style, s)
 		}
 	}
 }

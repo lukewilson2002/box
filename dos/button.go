@@ -1,6 +1,7 @@
 package dos
 
 import (
+	"github.com/fivemoreminix/box"
 	"github.com/gdamore/tcell/v2"
 	"github.com/mattn/go-runewidth"
 	"unicode/utf8"
@@ -20,7 +21,7 @@ func (b *Button) Press() {
 	}
 }
 
-func (b *Button) HandleMouse(currentRect Rect, ev *tcell.EventMouse) bool {
+func (b *Button) HandleMouse(currentRect box.Rect, ev *tcell.EventMouse) bool {
 	if ev.Buttons()&tcell.ButtonPrimary != 0 {
 		if currentRect.HasPoint(ev.Position()) {
 			b.Press()
@@ -46,7 +47,7 @@ func (b *Button) DisplaySize(boundsW, boundsH int) (w, h int) {
 	return runewidth.StringWidth(b.Text) + 4, 1
 }
 
-func (b *Button) Draw(rect Rect, s tcell.Screen) {
+func (b *Button) Draw(rect box.Rect, s tcell.Screen) {
 	w, _ := b.DisplaySize(rect.W, rect.H)
 
 	var style tcell.Style

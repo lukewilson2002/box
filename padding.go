@@ -1,4 +1,4 @@
-package dos
+package box
 
 import "github.com/gdamore/tcell/v2"
 

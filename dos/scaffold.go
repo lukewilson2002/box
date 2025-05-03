@@ -1,11 +1,14 @@
 package dos
 
-import "github.com/gdamore/tcell/v2"
+import (
+	"github.com/fivemoreminix/box"
+	"github.com/gdamore/tcell/v2"
+)
 
 type Scaffold struct {
 	MenuBar    *MenuBar
-	MainWidget Widget
-	Floating   []Widget
+	MainWidget box.Widget
+	Floating   []box.Widget
 	focusIdx   int
 }
 
@@ -60,7 +63,7 @@ func (s *Scaffold) setFocusFloating(v bool) {
 	}
 }
 
-func (s *Scaffold) mainWidgetRect(currentRect Rect) Rect {
+func (s *Scaffold) mainWidgetRect(currentRect box.Rect) box.Rect {
 	rect := currentRect
 	if s.MenuBar != nil {
 		_, h := s.MenuBar.DisplaySize(currentRect.W, currentRect.H)
@@ -68,10 +71,10 @@ func (s *Scaffold) mainWidgetRect(currentRect Rect) Rect {
 		rect.H -= h
 	}
 	w, h := s.MainWidget.DisplaySize(rect.W, rect.H)
-	return Rect{rect.X, rect.Y, w, h}
+	return box.Rect{rect.X, rect.Y, w, h}
 }
 
-func (s *Scaffold) HandleMouse(currentRect Rect, ev *tcell.EventMouse) bool {
+func (s *Scaffold) HandleMouse(currentRect box.Rect, ev *tcell.EventMouse) bool {
 	if len(s.Floating) > 0 {
 		for i := len(s.Floating) - 1; i >= 0; i-- {
 			if s.Floating[i].HandleMouse(currentRect, ev) {
@@ -102,7 +105,7 @@ func (s *Scaffold) HandleMouse(currentRect Rect, ev *tcell.EventMouse) bool {
 	}
 	if s.MenuBar != nil {
 		sizeX, sizeY := s.MenuBar.DisplaySize(currentRect.W, currentRect.H)
-		if s.MenuBar.HandleMouse(Rect{currentRect.X, currentRect.Y, sizeX, sizeY}, ev) {
+		if s.MenuBar.HandleMouse(box.Rect{currentRect.X, currentRect.Y, sizeX, sizeY}, ev) {
 			s.setFocusMainWidget(false)
 			s.setFocusFloating(false)
 			s.focusIdx = 0
@@ -149,12 +152,12 @@ func (s *Scaffold) DisplaySize(boundsW, boundsH int) (w, h int) {
 	return boundsW, boundsH
 }
 
-func (s *Scaffold) Draw(rect Rect, screen tcell.Screen) {
+func (s *Scaffold) Draw(rect box.Rect, screen tcell.Screen) {
 	if s.MainWidget != nil {
 		s.MainWidget.Draw(s.mainWidgetRect(rect), screen)
 	}
 	if s.MenuBar != nil {
-		s.MenuBar.Draw(Rect{0, 0, rect.W, 1}, screen)
+		s.MenuBar.Draw(box.Rect{0, 0, rect.W, 1}, screen)
 	}
 	for i := 0; i < len(s.Floating); i++ { // Draw back to front
 		s.Floating[i].Draw(rect, screen)

@@ -1,6 +1,9 @@
 package dos
 
-import "github.com/gdamore/tcell/v2"
+import (
+	"github.com/fivemoreminix/box"
+	"github.com/gdamore/tcell/v2"
+)
 
 type TextInput struct {
 	Text             string // User-entered content.
@@ -18,7 +21,7 @@ type TextInput struct {
 	focused   bool
 }
 
-func (t *TextInput) HandleMouse(currentRect Rect, ev *tcell.EventMouse) bool {
+func (t *TextInput) HandleMouse(currentRect box.Rect, ev *tcell.EventMouse) bool {
 	panic("implement me")
 }
 
@@ -34,6 +37,6 @@ func (t *TextInput) DisplaySize(boundsW, boundsH int) (w, h int) {
 	panic("implement me")
 }
 
-func (t *TextInput) Draw(rect Rect, s tcell.Screen) {
+func (t *TextInput) Draw(rect box.Rect, s tcell.Screen) {
 	panic("implement me")
 }

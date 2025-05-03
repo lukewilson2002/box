@@ -1,16 +1,19 @@
 package dos
 
-import "github.com/gdamore/tcell/v2"
+import (
+	"github.com/fivemoreminix/box"
+	"github.com/gdamore/tcell/v2"
+)
 
 // A Shadow draws a shadow covering one cell below, and two cells right of its
 // bounding box. This is useful for dialog windows or buttons that need depth.
 type Shadow struct {
-	Child     Widget
+	Child     box.Widget
 	Style     tcell.Style
 	MakeSmall bool
 }
 
-func (s *Shadow) HandleMouse(currentRect Rect, ev *tcell.EventMouse) bool {
+func (s *Shadow) HandleMouse(currentRect box.Rect, ev *tcell.EventMouse) bool {
 	if s.Child != nil {
 		return s.Child.HandleMouse(currentRect, ev)
 	}
@@ -45,7 +48,7 @@ func (s *Shadow) shadowCell(x, y int, screen tcell.Screen) (width int) {
 
 // Draw causes the Shadow to intentionally set cells outside its provided rect.
 // The provided rect is passed directly to the child.
-func (s *Shadow) Draw(rect Rect, screen tcell.Screen) {
+func (s *Shadow) Draw(rect box.Rect, screen tcell.Screen) {
 	// TODO: make Shadow extents configurable
 
 	reversedStyle := s.Style.Reverse(true)

@@ -1,6 +1,7 @@
 package dos
 
 import (
+	"github.com/fivemoreminix/box"
 	"github.com/gdamore/tcell/v2"
 	"github.com/mattn/go-runewidth"
 )
@@ -12,7 +13,7 @@ import (
 // Window an arbitrary position and size on the terminal.
 type Window struct {
 	Title            string
-	Child            Widget
+	Child            box.Widget
 	HideClose        bool
 	OnClosed         func()
 	DisableMoving    bool
@@ -33,15 +34,15 @@ func (w *Window) Close() {
 	}
 }
 
-func (w *Window) GetChildRect(rect Rect) *Rect {
+func (w *Window) GetChildRect(rect box.Rect) *box.Rect {
 	if w.Child != nil {
 		childW, childH := w.Child.DisplaySize(rect.W, rect.H-1)
-		return &Rect{rect.X, rect.Y + 1, childW, childH}
+		return &box.Rect{rect.X, rect.Y + 1, childW, childH}
 	}
 	return nil
 }
 
-func (w *Window) HandleMouse(rect Rect, ev *tcell.EventMouse) bool {
+func (w *Window) HandleMouse(rect box.Rect, ev *tcell.EventMouse) bool {
 	posX, posY := ev.Position()
 
 	if w.dragging {
@@ -110,7 +111,7 @@ func (w *Window) DisplaySize(boundsW, boundsH int) (int, int) {
 	return boundsW, boundsH
 }
 
-func (w *Window) Draw(rect Rect, s tcell.Screen) {
+func (w *Window) Draw(rect box.Rect, s tcell.Screen) {
 	for col := 0; col < rect.W; col++ {
 		s.SetContent(rect.X+col, rect.Y, ' ', nil, w.TitleBarStyle)
 		for row := 1; row < rect.H; row++ {
@@ -120,10 +121,10 @@ func (w *Window) Draw(rect Rect, s tcell.Screen) {
 	// Draw title
 	titleWidth := runewidth.StringWidth(w.Title)
 	col := rect.W/2 - titleWidth/2 // Center title
-	DrawString(rect.X+col, rect.Y, w.Title, w.TitleBarStyle, s)
+	box.DrawString(rect.X+col, rect.Y, w.Title, w.TitleBarStyle, s)
 	// Draw close button
 	if !w.HideClose {
-		DrawString(rect.X, rect.Y, " X ", w.CloseButtonStyle, s)
+		box.DrawString(rect.X, rect.Y, " X ", w.CloseButtonStyle, s)
 	}
 	// Draw child
 	if w.Child != nil {

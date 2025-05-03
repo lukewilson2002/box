@@ -1,4 +1,4 @@
-# dos
+# box
 *Not production ready.*
 
 Make portable MS-DOS style graphics with this library which draws inspiration
@@ -82,16 +82,11 @@ And as always, feel free to make a pull request.
 
 ## TODO
 
- [X] buffer: Count needs to use inclusive bounds
- [X] buffer: Cursor concrete type can have an assigned buffer and know how to navigate it.
- Buffers can have cursors added to their management and be treated as anchors. Users can
- move cursors and retain ownership of them.
- [ ] buffer: Cursor Up(times int), Down(times int) etc. repetition
- [ ] buffer: ManagedBuffer struct is a wrapper over cursors and buffers with a Command-based
- API with undo and redo. Aims to simplify common text-editing tasks.
- [X] buffer: Buffer LineDelimiter string and LineHasDelimiter(line) bool
- [ ] buffer: Make it possible for users of library to change how cursor skips words
- [ ] buffer: update rope_test.go and harden (abstract into buffer_test.go which tests all types of buffers using same code)
- [ ] dos: theme.go file with Theme management code and a default theme set. Used by all dos
- widgets when their style properties are nil. (Requires taking pointer to Styles now)
- Theme is probably map[string]tcell.Style for example Theme["WidgetState"] or Theme["ButtonFocused"]
+ - [X] buffer: Count needs to use inclusive bounds
+ - [X] buffer: Cursor concrete type can have an assigned buffer and know how to navigate it. Buffers can have cursors added to their management and be treated as anchors. Users can move cursors and retain ownership of them.
+ - [ ] buffer: Cursor Up(times int), Down(times int) etc. repetition
+ - [ ] buffer: ManagedBuffer struct is a wrapper over cursors and buffers with a Command-based API with undo and redo. Aims to simplify common text-editing tasks.
+ - [X] buffer: Buffer LineDelimiter string and LineHasDelimiter(line) bool
+ - [ ] buffer: Make it possible for users of library to change how cursor skips words
+ - [ ] buffer: update rope_test.go and harden (abstract into buffer_test.go which tests all types of buffers using same code)
+ - [ ] dos: theme.go file with Theme management code and a default theme set. Used by all dos widgets when their style properties are nil. (Requires taking pointer to Styles now) Theme is probably map[string]tcell.Style for example Theme["WidgetState"] or Theme["ButtonFocused"]

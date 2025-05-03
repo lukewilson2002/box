@@ -1,6 +1,7 @@
 package dos
 
 import (
+	"github.com/fivemoreminix/box"
 	"github.com/gdamore/tcell/v2"
 )
 
@@ -25,7 +26,7 @@ func (b BoxDecoration) WithStyle(style tcell.Style) BoxDecoration {
 // has a width of one terminal cell so double-wide characters will not be drawn
 // correctly using a Box and BoxDecoration combination.
 type Box struct {
-	Child      Widget
+	Child      box.Widget
 	Decoration *BoxDecoration
 }
 
@@ -43,7 +44,7 @@ var DefaultBoxDecoration = BoxDecoration{
 	Style:  tcell.StyleDefault,
 }
 
-func (b *Box) HandleMouse(currentRect Rect, ev *tcell.EventMouse) bool {
+func (b *Box) HandleMouse(currentRect box.Rect, ev *tcell.EventMouse) bool {
 	if b.Child != nil {
 		return b.Child.HandleMouse(currentRect, ev)
 	}
@@ -71,7 +72,7 @@ func (b *Box) DisplaySize(boundsW, boundsH int) (w, h int) {
 	return 0, 0
 }
 
-func (b *Box) Draw(rect Rect, s tcell.Screen) {
+func (b *Box) Draw(rect box.Rect, s tcell.Screen) {
 	// Do not draw if not even a single cell of room
 	if rect.W < 1 || rect.H < 1 {
 		return
@@ -82,9 +83,9 @@ func (b *Box) Draw(rect Rect, s tcell.Screen) {
 		decoration = &DefaultBoxDecoration
 	}
 
-	DrawBox(rect, decoration, s)
+	box.DrawBox(rect, decoration, s)
 
 	if b.Child != nil {
-		b.Child.Draw(Rect{rect.X + 1, rect.Y + 1, rect.W - 1, rect.H - 1}, s)
+		b.Child.Draw(box.Rect{rect.X + 1, rect.Y + 1, rect.W - 1, rect.H - 1}, s)
 	}
 }

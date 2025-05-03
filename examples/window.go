@@ -1,13 +1,11 @@
-//go:build ignore
-// +build ignore
-
 package main
 
 import (
 	"fmt"
+	"github.com/fivemoreminix/box/dos"
 	"os"
 
-	"github.com/fivemoreminix/dos"
+	"github.com/fivemoreminix/box"
 	"github.com/gdamore/tcell/v2"
 )
 
@@ -30,19 +28,19 @@ func main() {
 		fmt.Fprintf(os.Stderr, "failed to initialize: %v", err)
 	}
 
-	label := &dos.Label{
+	label := &box.Label{
 		Text:  quote,
-		Align: dos.AlignLeft,
+		Align: box.AlignLeft,
 		Style: defaultStyle,
 	}
 
-	var app dos.App
-	app = dos.App{
+	var app box.App
+	app = box.App{
 		ClearStyle: defaultStyle,
 		MainWidget: &dos.Scaffold{
 			MenuBar:    nil,
-			MainWidget: &dos.Center{Child: label},
-			Floating:   []dos.Widget{NewMainWindow(label)},
+			MainWidget: &box.Center{Child: label},
+			Floating:   []box.Widget{NewMainWindow(label)},
 		},
 		OnKeyEvent: func(ev *tcell.EventKey) bool {
 			if ev.Key() == tcell.KeyEsc {
@@ -55,10 +53,10 @@ func main() {
 	app.Run(screen)
 }
 
-func MakeDialog(title string, rect dos.Rect, child dos.Widget) dos.Widget {
-	align := &dos.Align{
+func MakeDialog(title string, rect box.Rect, child box.Widget) box.Widget {
+	align := &box.Align{
 		Child:       nil,
-		Positioning: dos.Absolute,
+		Positioning: box.Absolute,
 		Rect:        rect,
 	}
 	align.Child = &dos.Shadow{
@@ -79,8 +77,8 @@ func MakeDialog(title string, rect dos.Rect, child dos.Widget) dos.Widget {
 	return align
 }
 
-func makeButton(title string, action func()) dos.Widget {
-	return &dos.Padding{
+func makeButton(title string, action func()) box.Widget {
+	return &box.Padding{
 		Child: &dos.Shadow{
 			Child: &dos.Button{
 				Text:         title,
@@ -98,14 +96,14 @@ func makeButton(title string, action func()) dos.Widget {
 	}
 }
 
-func NewMainWindow(label *dos.Label) dos.Widget {
-	row := &dos.Row{
-		Children: []dos.Widget{
-			makeButton("Left align", func() { label.Align = dos.AlignLeft }),
-			makeButton("Center align", func() { label.Align = dos.AlignCenter }),
-			makeButton("Right align", func() { label.Align = dos.AlignRight }),
+func NewMainWindow(label *box.Label) box.Widget {
+	row := &box.Row{
+		Children: []box.Widget{
+			makeButton("Left align", func() { label.Align = box.AlignLeft }),
+			makeButton("Center align", func() { label.Align = box.AlignCenter }),
+			makeButton("Right align", func() { label.Align = box.AlignRight }),
 		},
-		OnKeyEvent: func(row *dos.Row, ev *tcell.EventKey) bool {
+		OnKeyEvent: func(row *box.Row, ev *tcell.EventKey) bool {
 			switch ev.Key() {
 			case tcell.KeyRight:
 				fallthrough
@@ -121,12 +119,12 @@ func NewMainWindow(label *dos.Label) dos.Widget {
 	}
 	return MakeDialog(
 		"Text Alignment",
-		dos.Rect{5, 3, 53, 6},
-		&dos.Center{
-			Child: &dos.Column{
-				Children: []dos.Widget{
-					&dos.Padding{
-						Child: &dos.Label{
+		box.Rect{5, 3, 53, 6},
+		&box.Center{
+			Child: &box.Column{
+				Children: []box.Widget{
+					&box.Padding{
+						Child: &box.Label{
 							Text:  "Choose a text alignment",
 							Style: windowStyle,
 						},
@@ -134,7 +132,7 @@ func NewMainWindow(label *dos.Label) dos.Widget {
 					},
 					row,
 				},
-				HorizontalAlign: dos.AlignCenter,
+				HorizontalAlign: box.AlignCenter,
 				FocusedIndex:    1, // Focus row only
 			},
 		},

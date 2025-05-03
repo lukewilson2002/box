@@ -1,11 +1,8 @@
-//go:build ignore
-// +build ignore
-
 package main
 
 import (
 	"fmt"
-	"github.com/fivemoreminix/dos"
+	"github.com/fivemoreminix/box"
 	"github.com/gdamore/tcell/v2"
 	"os"
 )
@@ -19,21 +16,21 @@ func main() {
 		fmt.Fprintf(os.Stderr, "failed to initialize: %v", err)
 	}
 
-	widget := &dos.Row{
-		Children: []dos.Widget{
-			&dos.Column{ // Labels
-				Children: []dos.Widget{
-					&dos.Label{Text: "Username: "},
-					&dos.Label{Text: "Password: "},
-					&dos.Label{Text: "Favorite number: "},
+	widget := &box.Row{
+		Children: []box.Widget{
+			&box.Column{ // Labels
+				Children: []box.Widget{
+					&box.Label{Text: "Username: "},
+					&box.Label{Text: "Password: "},
+					&box.Label{Text: "Favorite number: "},
 				},
-				HorizontalAlign: dos.AlignRight,
+				HorizontalAlign: box.AlignRight,
 			}, // Fields
-			&dos.Column{
-				Children: []dos.Widget{
+			&box.Column{
+				Children: []box.Widget{
 					// TODO: input fields
 				},
-				OnKeyEvent: func(col *dos.Column, ev *tcell.EventKey) bool {
+				OnKeyEvent: func(col *box.Column, ev *tcell.EventKey) bool {
 					if ev.Key() == tcell.KeyTab {
 						col.FocusNext()
 						return true
@@ -45,8 +42,8 @@ func main() {
 		FocusedIndex: 1,
 	}
 
-	var app dos.App
-	app = dos.App{
+	var app box.App
+	app = box.App{
 		MainWidget: widget,
 		OnKeyEvent: func(ev *tcell.EventKey) bool {
 			if ev.Key() == tcell.KeyEsc {

@@ -1,4 +1,4 @@
-module github.com/fivemoreminix/dos
+module github.com/fivemoreminix/box
 
 go 1.14
 

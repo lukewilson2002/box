@@ -1,6 +1,7 @@
 package dos
 
 import (
+	"github.com/fivemoreminix/box"
 	"github.com/gdamore/tcell/v2"
 	"github.com/mattn/go-runewidth"
 )
@@ -49,7 +50,7 @@ func (m *Menu) ActivateItem(idx int) {
 	}
 }
 
-func (m *Menu) HandleMouse(rect Rect, ev *tcell.EventMouse) bool {
+func (m *Menu) HandleMouse(rect box.Rect, ev *tcell.EventMouse) bool {
 	if ev.Buttons() == tcell.ButtonPrimary {
 		sizeW, sizeH := m.DisplaySize(0, 0)
 		posX, posY := ev.Position()
@@ -128,7 +129,7 @@ func (m *Menu) DisplaySize(int, int) (w int, h int) {
 	}
 }
 
-func (m *Menu) Draw(rect Rect, s tcell.Screen) {
+func (m *Menu) Draw(rect box.Rect, s tcell.Screen) {
 	width, _ := m.DisplaySize(0, 0)
 	offsetX, offsetY := 0, 0
 	decoration := m.Decoration
@@ -138,7 +139,7 @@ func (m *Menu) Draw(rect Rect, s tcell.Screen) {
 		if decoration == nil {
 			decoration = &DefaultBoxDecoration
 		}
-		DrawBox(rect, decoration, s)
+		box.DrawBox(rect, decoration, s)
 	}
 	for i := 0; i < len(m.Items); i++ {
 		style := m.NormalStyle
@@ -156,7 +157,7 @@ func (m *Menu) Draw(rect Rect, s tcell.Screen) {
 			for col := 0; col < width-offsetX*2; col++ {
 				s.SetContent(rect.X+offsetX+col, rect.Y+offsetY+i, ' ', nil, style)
 			}
-			DrawString(rect.X+offsetX, rect.Y+offsetY+i, m.Items[i].Title, style, s)
+			box.DrawString(rect.X+offsetX, rect.Y+offsetY+i, m.Items[i].Title, style, s)
 		}
 	}
 }

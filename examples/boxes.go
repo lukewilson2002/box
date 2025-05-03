@@ -1,13 +1,11 @@
-//go:build ignore
-// +build ignore
-
 package main
 
 import (
 	"fmt"
+	"github.com/fivemoreminix/box/dos"
 	"os"
 
-	"github.com/fivemoreminix/dos"
+	"github.com/fivemoreminix/box"
 	"github.com/gdamore/tcell/v2"
 )
 
@@ -20,8 +18,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "failed to initialize: %v", err)
 	}
 
-	var app dos.App
-	app = dos.App{
+	var app box.App
+	app = box.App{
 		MainWidget: NewMainWidget(),
 		OnKeyEvent: func(ev *tcell.EventKey) bool {
 			if ev.Key() == tcell.KeyEsc {
@@ -35,26 +33,26 @@ func main() {
 }
 
 type MainWidget struct {
-	align dos.Align
-	label *dos.Label
+	align box.Align
+	label *box.Label
 }
 
 func NewMainWidget() *MainWidget {
-	label := &dos.Label{
+	label := &box.Label{
 		Text: "Type something!",
 	}
 	return &MainWidget{
-		align: dos.Align{
+		align: box.Align{
 			Child: &dos.Box{
 				Child: label,
 			},
-			Positioning: dos.Absolute,
+			Positioning: box.Absolute,
 		},
 		label: label,
 	}
 }
 
-func (m *MainWidget) HandleMouse(currentRect dos.Rect, ev *tcell.EventMouse) bool {
+func (m *MainWidget) HandleMouse(currentRect box.Rect, ev *tcell.EventMouse) bool {
 	curX, curY := ev.Position()
 	m.align.Rect.X, m.align.Rect.Y = curX-m.align.Rect.W, curY-m.align.Rect.H
 	return true
@@ -81,7 +79,7 @@ func (m *MainWidget) DisplaySize(boundsW, boundsH int) (w, h int) {
 	return m.align.DisplaySize(boundsW, boundsH)
 }
 
-func (m *MainWidget) Draw(rect dos.Rect, s tcell.Screen) {
+func (m *MainWidget) Draw(rect box.Rect, s tcell.Screen) {
 	// Because the Align is set to Absolute positioning, we give it a position and size through m.align.Rect
 	// I cheat and directly access the align's child to know how big it plans to be, because the align will always
 	// return 0,0 for an absolute size (as expected)
