@@ -139,7 +139,7 @@ func (m *Menu) Draw(rect box.Rect, s tcell.Screen) {
 		if decoration == nil {
 			decoration = &DefaultBoxDecoration
 		}
-		box.DrawBox(rect, decoration, s)
+		DrawBox(rect, decoration, s)
 	}
 	for i := 0; i < len(m.Items); i++ {
 		style := m.NormalStyle

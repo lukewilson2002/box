@@ -1,8 +1,11 @@
 package dos
 
-import "github.com/gdamore/tcell/v2"
+import (
+	"github.com/fivemoreminix/box"
+	"github.com/gdamore/tcell/v2"
+)
 
-func DrawBox(rect Rect, decoration *dos.BoxDecoration, s tcell.Screen) {
+func DrawBox(rect box.Rect, decoration *BoxDecoration, s tcell.Screen) {
 	// Draw top left and bottom left corners
 	s.SetContent(rect.X, rect.Y, decoration.TL, nil, decoration.Style)
 	s.SetContent(rect.X, rect.Y+rect.H-1, decoration.BL, nil, decoration.Style)

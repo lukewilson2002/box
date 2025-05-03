@@ -83,7 +83,7 @@ func (b *Box) Draw(rect box.Rect, s tcell.Screen) {
 		decoration = &DefaultBoxDecoration
 	}
 
-	box.DrawBox(rect, decoration, s)
+	DrawBox(rect, decoration, s)
 
 	if b.Child != nil {
 		b.Child.Draw(box.Rect{rect.X + 1, rect.Y + 1, rect.W - 1, rect.H - 1}, s)
