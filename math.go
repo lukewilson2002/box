@@ -28,6 +28,10 @@ type Rect struct {
 	W, H int
 }
 
+func (r Rect) Equals(other Rect) bool {
+	return r.X == other.X && r.Y == other.Y && r.W == other.W && r.H == other.H
+}
+
 func (r Rect) HasPoint(x, y int) bool {
 	return x >= r.X && y >= r.Y && x < r.X+r.W && y < r.Y+r.H
 }
@@ -57,7 +61,12 @@ func (r Rect) WithSize(w, h int) Rect {
 }
 
 func (r Rect) Contract(amt int) Rect {
-	return Rect{r.X + amt, r.Y + amt, r.W - amt*2, r.H - amt*2}
+	w := r.W - amt*2
+	h := r.H - amt*2
+	if w < 0 || h < 0 {
+		return r
+	}
+	return Rect{r.X + amt, r.Y + amt, w, h}
 }
 
 func (r Rect) Expand(amt int) Rect {
