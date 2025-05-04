@@ -10,6 +10,8 @@ type Padding struct {
 	Left   int
 }
 
+var _ Widget = (*Padding)(nil)
+
 func (p *Padding) GetChildRect(currentRect Rect) Rect {
 	return Rect{
 		currentRect.X + p.Left,
@@ -17,6 +19,10 @@ func (p *Padding) GetChildRect(currentRect Rect) Rect {
 		currentRect.W - p.Left - p.Right,
 		currentRect.H - p.Top - p.Bottom,
 	}
+}
+
+func (p *Padding) GetChildren() []Widget {
+	return []Widget{p.Child}
 }
 
 func (p *Padding) HandleMouse(currentRect Rect, ev *tcell.EventMouse) bool {
@@ -39,12 +45,14 @@ func (p *Padding) SetFocused(b bool) {
 	}
 }
 
-func (p *Padding) DisplaySize(boundsW, boundsH int) (w, h int) {
+func (p *Padding) Bounds(space Rect) Rect {
 	if p.Child != nil {
-		w, h = p.Child.DisplaySize(boundsW-p.Left-p.Right, boundsH-p.Top-p.Bottom)
-		return w + p.Left + p.Right, h + p.Top + p.Bottom
+		w, h := p.Child.Bounds(space.
+			WithSize(space.W-p.Left-p.Right, space.H-p.Top-p.Bottom)).
+			Size()
+		return space.WithSize(w+p.Left+p.Right, h+p.Top+p.Bottom)
 	}
-	return 0, 0
+	return space.WithSize(0, 0)
 }
 
 func (p *Padding) Draw(rect Rect, s tcell.Screen) {

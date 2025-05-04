@@ -13,6 +13,8 @@ type MenuBarItem struct {
 	Menu
 }
 
+var _ box.Widget = (*MenuBarItem)(nil)
+
 type MenuBar struct {
 	Menus          []MenuBarItem
 	NormalStyle    tcell.Style
@@ -21,6 +23,8 @@ type MenuBar struct {
 	expanded       bool // Whether the user is expanding the menus currently
 	focused        bool // Whether to accept keyboard input and highlight selection
 }
+
+var _ box.Widget = (*MenuBar)(nil)
 
 // ItemRects returns a slice of Rects for each Menu's title that the user
 // selects before expanding the actual Menu. The returned slice length will be
@@ -35,6 +39,14 @@ func (m *MenuBar) ItemRects(rect box.Rect) []box.Rect {
 		col += textWidth + 2
 	}
 	return rects
+}
+
+func (m *MenuBar) GetChildren() []box.Widget {
+	children := make([]box.Widget, len(m.Menus))
+	for i, menu := range m.Menus {
+		children[i] = &menu
+	}
+	return children
 }
 
 func (m *MenuBar) HandleMouse(currentRect box.Rect, ev *tcell.EventMouse) bool {
@@ -99,8 +111,8 @@ func (m *MenuBar) SetFocused(b bool) {
 	// menus do not accept focus.
 }
 
-func (m *MenuBar) DisplaySize(boundsW, _ int) (w, h int) {
-	return boundsW, 1
+func (m *MenuBar) Bounds(space box.Rect) box.Rect {
+	return space.WithSize(space.W, 1)
 }
 
 func (m *MenuBar) Draw(rect box.Rect, s tcell.Screen) {
@@ -115,7 +127,7 @@ func (m *MenuBar) Draw(rect box.Rect, s tcell.Screen) {
 				style = m.SelectionStyle
 
 				if m.expanded { // If the selected menu is also expanded
-					menuW, menuH := m.Menus[i].DisplaySize(0, 0)
+					menuW, menuH := m.Menus[i].Bounds(rect).Size()
 					m.Menus[i].Draw(box.Rect{r.X, r.Y + 1, menuW, menuH}, s)
 				}
 			}

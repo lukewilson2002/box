@@ -5,6 +5,20 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
+var DefaultBoxDecoration = BoxDecoration{
+	Hor:    '─',
+	Vert:   '│',
+	TL:     '┌',
+	TR:     '┐',
+	BR:     '┘',
+	BL:     '└',
+	JointT: '┬',
+	JointR: '┤',
+	JointB: '┴',
+	JointL: '├',
+	Style:  tcell.StyleDefault,
+}
+
 // The BoxDecoration allows for an individual rune per side and corner of the
 // box being drawn. See https://en.wikipedia.org/wiki/Box-drawing_character
 type BoxDecoration struct {
@@ -30,18 +44,10 @@ type Box struct {
 	Decoration *BoxDecoration
 }
 
-var DefaultBoxDecoration = BoxDecoration{
-	Hor:    '─',
-	Vert:   '│',
-	TL:     '┌',
-	TR:     '┐',
-	BR:     '┘',
-	BL:     '└',
-	JointT: '┬',
-	JointR: '┤',
-	JointB: '┴',
-	JointL: '├',
-	Style:  tcell.StyleDefault,
+var _ box.Widget = (*Box)(nil)
+
+func (b *Box) GetChildren() []box.Widget {
+	return []box.Widget{b.Child}
 }
 
 func (b *Box) HandleMouse(currentRect box.Rect, ev *tcell.EventMouse) bool {
@@ -64,12 +70,13 @@ func (b *Box) SetFocused(v bool) {
 	}
 }
 
-func (b *Box) DisplaySize(boundsW, boundsH int) (w, h int) {
+func (b *Box) Bounds(space box.Rect) box.Rect {
 	if b.Child != nil {
-		childW, childH := b.Child.DisplaySize(boundsW-2, boundsH-2)
-		return childW + 2, childH + 2
+		inner := space.Contract(1)
+		childRect := b.Child.Bounds(inner)
+		return childRect.Expand(1)
 	}
-	return 0, 0
+	return space.WithSize(0, 0)
 }
 
 func (b *Box) Draw(rect box.Rect, s tcell.Screen) {
@@ -86,6 +93,6 @@ func (b *Box) Draw(rect box.Rect, s tcell.Screen) {
 	DrawBox(rect, decoration, s)
 
 	if b.Child != nil {
-		b.Child.Draw(box.Rect{rect.X + 1, rect.Y + 1, rect.W - 1, rect.H - 1}, s)
+		b.Child.Draw(rect.Contract(1), s)
 	}
 }

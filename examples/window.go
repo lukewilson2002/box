@@ -28,20 +28,22 @@ func main() {
 		fmt.Fprintf(os.Stderr, "failed to initialize: %v", err)
 	}
 
-	label := &box.Label{
+	label := &box.Text{
 		Text:  quote,
 		Align: box.AlignLeft,
 		Style: defaultStyle,
 	}
 
+	primary := &dos.Scaffold{
+		MenuBar:    nil,
+		MainWidget: &box.Center{Child: label},
+		Floating:   []box.Widget{NewMainWindow(label)},
+	}
+
 	var app box.App
 	app = box.App{
 		ClearStyle: defaultStyle,
-		MainWidget: &dos.Scaffold{
-			MenuBar:    nil,
-			MainWidget: &box.Center{Child: label},
-			Floating:   []box.Widget{NewMainWindow(label)},
-		},
+		MainWidget: primary,
 		OnKeyEvent: func(ev *tcell.EventKey) bool {
 			if ev.Key() == tcell.KeyEsc {
 				app.Running = false
@@ -96,7 +98,7 @@ func makeButton(title string, action func()) box.Widget {
 	}
 }
 
-func NewMainWindow(label *box.Label) box.Widget {
+func NewMainWindow(label *box.Text) box.Widget {
 	row := &box.Row{
 		Children: []box.Widget{
 			makeButton("Left align", func() { label.Align = box.AlignLeft }),
@@ -124,7 +126,7 @@ func NewMainWindow(label *box.Label) box.Widget {
 			Child: &box.Column{
 				Children: []box.Widget{
 					&box.Padding{
-						Child: &box.Label{
+						Child: &box.Text{
 							Text:  "Choose a text alignment",
 							Style: windowStyle,
 						},

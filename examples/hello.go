@@ -19,7 +19,7 @@ func main() {
 
 	// Here we construct the GUI
 	widget := &box.Center{
-		Child: &box.Label{
+		Child: &box.Text{
 			Text:  "Hello, world!\nTry resizing the screen!",
 			Style: tcell.StyleDefault.Foreground(tcell.ColorRed),
 		},

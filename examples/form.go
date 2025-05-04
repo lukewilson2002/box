@@ -21,9 +21,9 @@ func main() {
 		Children: []box.Widget{
 			&box.Column{ // Labels
 				Children: []box.Widget{
-					&box.Label{Text: "Username: "},
-					&box.Label{Text: "Password: "},
-					&box.Label{Text: "Favorite number: "},
+					&box.Text{Text: "Username: "},
+					&box.Text{Text: "Password: "},
+					&box.Text{Text: "Favorite number: "},
 				},
 				HorizontalAlign: box.AlignRight,
 			}, // Fields

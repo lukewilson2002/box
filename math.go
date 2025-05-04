@@ -1,7 +1,5 @@
 package box
 
-import "testing"
-
 // Min returns the smaller of the two values.
 func Min(a, b int) int {
 	if a < b {
@@ -34,24 +32,34 @@ func (r Rect) HasPoint(x, y int) bool {
 	return x >= r.X && y >= r.Y && x < r.X+r.W && y < r.Y+r.H
 }
 
-func TestRectHasPoint(t *testing.T) {
-	if !(Rect{0, 0, 1, 1}.HasPoint(0, 0)) {
-		t.Fail()
-	}
-	if (Rect{1, 1, 1, 1}.HasPoint(0, 0)) {
-		t.Fail()
-	}
-	if (Rect{1, 1, 0, 0}.HasPoint(1, 1)) {
-		t.Fail()
-	}
-	wide := Rect{3, 2, 15, 4}
-	if wide.HasPoint(5, 1) {
-		t.Fail()
-	}
-	if wide.HasPoint(8, 7) {
-		t.Fail()
-	}
-	if !wide.HasPoint(5, 3) {
-		t.Fail()
-	}
+func (r Rect) Add(other Rect) Rect {
+	return Rect{r.X + other.X, r.Y + other.Y, r.W + other.W, r.H + other.H}
+}
+
+func (r Rect) Sub(other Rect) Rect {
+	return Rect{r.X - other.X, r.Y - other.Y, r.W - other.W, r.H - other.H}
+}
+
+func (r Rect) Pos() (x, y int) {
+	return r.X, r.Y
+}
+
+func (r Rect) Size() (w, h int) {
+	return r.W, r.H
+}
+
+func (r Rect) WithPos(x, y int) Rect {
+	return Rect{x, y, r.W, r.H}
+}
+
+func (r Rect) WithSize(w, h int) Rect {
+	return Rect{r.X, r.Y, w, h}
+}
+
+func (r Rect) Contract(amt int) Rect {
+	return Rect{r.X + amt, r.Y + amt, r.W - amt*2, r.H - amt*2}
+}
+
+func (r Rect) Expand(amt int) Rect {
+	return Rect{r.X - amt, r.Y - amt, r.W + amt*2, r.H + amt*2}
 }

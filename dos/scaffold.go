@@ -12,6 +12,8 @@ type Scaffold struct {
 	focusIdx   int
 }
 
+var _ box.Widget = (*Scaffold)(nil)
+
 func (s *Scaffold) IsMenuBarFocused() bool {
 	return s.focusIdx == 0
 }
@@ -66,18 +68,26 @@ func (s *Scaffold) setFocusFloating(v bool) {
 func (s *Scaffold) mainWidgetRect(currentRect box.Rect) box.Rect {
 	rect := currentRect
 	if s.MenuBar != nil {
-		_, h := s.MenuBar.DisplaySize(currentRect.W, currentRect.H)
+		_, h := s.MenuBar.Bounds(currentRect).Size()
 		rect.Y += h
 		rect.H -= h
 	}
-	w, h := s.MainWidget.DisplaySize(rect.W, rect.H)
+	w, h := s.MainWidget.Bounds(rect).Size()
 	return box.Rect{rect.X, rect.Y, w, h}
+}
+
+func (s *Scaffold) GetChildren() []box.Widget {
+	children := make([]box.Widget, 1+len(s.Floating))
+	children[0] = s.MainWidget
+	copy(children[1:], s.Floating)
+	return children
 }
 
 func (s *Scaffold) HandleMouse(currentRect box.Rect, ev *tcell.EventMouse) bool {
 	if len(s.Floating) > 0 {
 		for i := len(s.Floating) - 1; i >= 0; i-- {
-			if s.Floating[i].HandleMouse(currentRect, ev) {
+			bounds := s.Floating[i].Bounds(currentRect)
+			if s.Floating[i].HandleMouse(bounds, ev) {
 				// This window handled the event, if they are not at the end of
 				// the slice, then we move them there (so they're drawn last).
 				if i != len(s.Floating)-1 {
@@ -104,7 +114,7 @@ func (s *Scaffold) HandleMouse(currentRect box.Rect, ev *tcell.EventMouse) bool 
 		}
 	}
 	if s.MenuBar != nil {
-		sizeX, sizeY := s.MenuBar.DisplaySize(currentRect.W, currentRect.H)
+		sizeX, sizeY := s.MenuBar.Bounds(currentRect).Size()
 		if s.MenuBar.HandleMouse(box.Rect{currentRect.X, currentRect.Y, sizeX, sizeY}, ev) {
 			s.setFocusMainWidget(false)
 			s.setFocusFloating(false)
@@ -148,8 +158,8 @@ func (s *Scaffold) SetFocused(b bool) {
 	}
 }
 
-func (s *Scaffold) DisplaySize(boundsW, boundsH int) (w, h int) {
-	return boundsW, boundsH
+func (s *Scaffold) Bounds(space box.Rect) box.Rect {
+	return space
 }
 
 func (s *Scaffold) Draw(rect box.Rect, screen tcell.Screen) {

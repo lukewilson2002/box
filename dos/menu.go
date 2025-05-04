@@ -39,6 +39,8 @@ type Menu struct {
 	itemsExpanded  bool // True if the Selected submenu should be visible
 }
 
+var _ box.Widget = (*Menu)(nil)
+
 func (m *Menu) ActivateItem(idx int) {
 	switch item := m.Items[idx]; item.Type {
 	case MenuItemAction:
@@ -50,9 +52,13 @@ func (m *Menu) ActivateItem(idx int) {
 	}
 }
 
+func (m *Menu) GetChildren() []box.Widget {
+	return nil
+}
+
 func (m *Menu) HandleMouse(rect box.Rect, ev *tcell.EventMouse) bool {
 	if ev.Buttons() == tcell.ButtonPrimary {
-		sizeW, sizeH := m.DisplaySize(0, 0)
+		sizeW, sizeH := m.Bounds(rect.WithSize(0, 0)).Size()
 		posX, posY := ev.Position()
 		// Check if user clicked any part of the menu (including border)
 		if posX >= rect.X && posX < rect.X+sizeW && posY >= rect.Y && posY < rect.Y+sizeH {
@@ -112,9 +118,9 @@ func (m *Menu) HandleKey(ev *tcell.EventKey) bool {
 
 func (m *Menu) SetFocused(bool) {}
 
-// DisplaySize for Menu returns the minimum size to show the Menu normally,
-// so it ignores the input boundary values.
-func (m *Menu) DisplaySize(int, int) (w int, h int) {
+// Bounds for Menu returns the minimum size to show the Menu normally,
+// so it ignores the input space's width and height values.
+func (m *Menu) Bounds(space box.Rect) box.Rect {
 	// Find the widest item
 	widestItemWidth := 0
 	for i := range m.Items {
@@ -123,14 +129,14 @@ func (m *Menu) DisplaySize(int, int) (w int, h int) {
 		}
 	}
 	if m.Decorated {
-		return widestItemWidth + 2, len(m.Items) + 2
+		return space.WithSize(widestItemWidth+2, len(m.Items)+2)
 	} else {
-		return widestItemWidth, len(m.Items)
+		return space.WithSize(widestItemWidth, len(m.Items))
 	}
 }
 
 func (m *Menu) Draw(rect box.Rect, s tcell.Screen) {
-	width, _ := m.DisplaySize(0, 0)
+	width, _ := m.Bounds(rect).Size()
 	offsetX, offsetY := 0, 0
 	decoration := m.Decoration
 	if m.Decorated {

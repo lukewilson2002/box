@@ -2,46 +2,37 @@ package box
 
 import (
 	"github.com/gdamore/tcell/v2"
+	"log"
 )
 
-type Positioning uint8
-
-const (
-	// Inherit is the default layout for all Widgets. The Rect property will be
-	// ignored. Calling Align's DisplaySize will return DisplaySize on the
-	// Child.
-	Inherit Positioning = iota
-	// Absolute positioning causes a Widget to be placed at any X, Y coordinate
-	// with any arbitrary width and height as specified. This is useful for
-	// drop-down menus or other floating widgets. Calling Align's DisplaySize
-	// will return zero.
-	Absolute
-	// Relative positioning is similar to Absolute, but causes a Widget to
-	// inherit its parent's position. Calling Align's DisplaySize will return
-	// zero.
-	Relative
-)
-
+// TODO: test and improve this component
 type Align struct {
 	Child       Widget
 	Positioning Positioning
-	Rect        Rect // Rect of Child if Positioning is Absolute or Relative.
+	Rect        Rect // Rect of Child if Positioning is Absolute.
 }
 
-func (a *Align) GetChildRect(currentRect Rect) Rect {
+var _ Widget = (*Align)(nil)
+
+func (a *Align) GetChildBounds(rect Rect) Rect {
 	switch a.Positioning {
 	case Absolute:
 		return a.Rect
 	case Relative:
-		return Rect{currentRect.X + a.Rect.X, currentRect.Y + a.Rect.Y, a.Rect.W, a.Rect.H}
+		return a.Rect.Add(Rect{X: rect.X, Y: rect.Y}) // Offset
 	default:
-		return currentRect
+		return rect
 	}
 }
 
-func (a *Align) HandleMouse(currentRect Rect, ev *tcell.EventMouse) bool {
+func (a *Align) GetChildren() []Widget {
+	return []Widget{a.Child}
+}
+
+func (a *Align) HandleMouse(rect Rect, ev *tcell.EventMouse) bool {
+	log.Println("Align", rect)
 	if a.Child != nil {
-		return a.Child.HandleMouse(a.GetChildRect(currentRect), ev)
+		return a.Child.HandleMouse(a.Child.Bounds(rect), ev)
 	}
 	return false
 }
@@ -59,22 +50,28 @@ func (a *Align) SetFocused(b bool) {
 	}
 }
 
-func (a *Align) DisplaySize(boundsW, boundsH int) (w, h int) {
+func (a *Align) Bounds(space Rect) Rect {
 	if a.Child != nil {
 		switch a.Positioning {
 		case Absolute:
-			fallthrough
+			// FIXME: In the future,
+			// when all functions take "space" and not actual rect,
+			//make this space.WithSize(0,
+			//0) because Absolute Align has no size, but the child DOES
+			//return space.WithSize(0, 0)
+
+			return a.Rect
 		case Relative:
-			return 0, 0
+			fallthrough
 		default:
-			return a.Child.DisplaySize(boundsW, boundsH)
+			return a.Child.Bounds(space)
 		}
 	}
-	return 0, 0
+	return space.WithSize(0, 0)
 }
 
 func (a *Align) Draw(rect Rect, s tcell.Screen) {
 	if a.Child != nil {
-		a.Child.Draw(a.GetChildRect(rect), s)
+		a.Child.Draw(a.GetChildBounds(rect), s)
 	}
 }

@@ -6,16 +6,6 @@ import (
 	"strings"
 )
 
-type Alignment uint8
-
-const (
-	AlignLeft Alignment = iota
-	AlignRight
-	AlignCenter
-	AlignStart = AlignLeft
-	AlignEnd   = AlignRight
-)
-
 // ConfineString inserts newlines where a line would run out of the rect,
 // and trims the string to have no more lines than rows in the rect. Returns
 // the formatted lines, the minimum columns to draw it, and the number of
@@ -41,11 +31,15 @@ func ConfineString(s string, rect Rect, separator string) (lines []string, width
 			}
 		}
 	}
-	lines = lines[:Min(len(lines), rect.H)] // Keep line count only as large as rect height
+
+	limit := Min(len(lines), rect.H)
+	if limit >= 0 {
+		lines = lines[:limit] // Keep line count only as large as rect height
+	}
 	return lines, width, len(lines)
 }
 
-type Label struct {
+type Text struct {
 	Text      string
 	Align     Alignment
 	WrapLen   int    // Force the text to wrap after a specified number of terminal cells.
@@ -53,48 +47,54 @@ type Label struct {
 	Style     tcell.Style
 }
 
-func (l *Label) GetSeparator() string {
-	if len(l.Separator) == 0 {
+var _ Widget = (*Text)(nil)
+
+func (t *Text) GetSeparator() string {
+	if len(t.Separator) == 0 {
 		return "\n"
 	} else {
-		return l.Separator
+		return t.Separator
 	}
 }
 
-func (l *Label) HandleMouse(_ Rect, _ *tcell.EventMouse) bool {
+func (t *Text) GetChildren() []Widget {
+	return nil
+}
+
+func (t *Text) HandleMouse(_ Rect, _ *tcell.EventMouse) bool {
 	return false
 }
 
-func (l *Label) HandleKey(_ *tcell.EventKey) bool {
+func (t *Text) HandleKey(_ *tcell.EventKey) bool {
 	return false
 }
 
-func (l *Label) SetFocused(_ bool) {}
+func (t *Text) SetFocused(_ bool) {}
 
-func (l *Label) DisplaySize(boundsW, boundsH int) (w, h int) {
-	rect := Rect{0, 0, boundsW, boundsH}
-	if l.WrapLen > 0 {
-		rect.W = Min(l.WrapLen, rect.W)
+func (t *Text) Bounds(space Rect) Rect {
+	rect := space
+	if t.WrapLen > 0 {
+		rect.W = Min(t.WrapLen, rect.W)
 	}
-	_, w, h = ConfineString(l.Text, rect, l.GetSeparator())
-	return w, h
+	_, w, h := ConfineString(t.Text, rect, t.GetSeparator())
+	return space.WithSize(w, h)
 }
 
-func (l *Label) Draw(rect Rect, s tcell.Screen) {
-	if l.WrapLen > 0 {
-		rect.W = Min(l.WrapLen, rect.W)
+func (t *Text) Draw(rect Rect, s tcell.Screen) {
+	if t.WrapLen > 0 {
+		rect.W = Min(t.WrapLen, rect.W)
 	}
-	lines, _, lineCount := ConfineString(l.Text, rect, l.GetSeparator())
+	lines, _, lineCount := ConfineString(t.Text, rect, t.GetSeparator())
 	for i := 0; i < lineCount; i++ {
-		switch l.Align {
+		switch t.Align {
 		case AlignCenter:
 			x := rect.X + rect.W/2 - runewidth.StringWidth(lines[i])/2
-			DrawString(x, rect.Y+i, lines[i], l.Style, s)
+			DrawString(x, rect.Y+i, lines[i], t.Style, s)
 		case AlignRight:
 			x := rect.X + rect.W - runewidth.StringWidth(lines[i])
-			DrawString(x, rect.Y+i, lines[i], l.Style, s)
+			DrawString(x, rect.Y+i, lines[i], t.Style, s)
 		default:
-			DrawString(rect.X, rect.Y+i, lines[i], l.Style, s)
+			DrawString(rect.X, rect.Y+i, lines[i], t.Style, s)
 		}
 	}
 }

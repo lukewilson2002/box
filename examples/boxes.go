@@ -33,23 +33,29 @@ func main() {
 }
 
 type MainWidget struct {
-	align box.Align
-	label *box.Label
+	align *box.Align
+	text  *box.Text
 }
 
+var _ box.Widget = (*MainWidget)(nil)
+
 func NewMainWidget() *MainWidget {
-	label := &box.Label{
+	text := &box.Text{
 		Text: "Type something!",
 	}
 	return &MainWidget{
-		align: box.Align{
+		align: &box.Align{
 			Child: &dos.Box{
-				Child: label,
+				Child: text,
 			},
 			Positioning: box.Absolute,
 		},
-		label: label,
+		text: text,
 	}
+}
+
+func (m *MainWidget) GetChildren() []box.Widget {
+	return []box.Widget{m.align, m.text}
 }
 
 func (m *MainWidget) HandleMouse(currentRect box.Rect, ev *tcell.EventMouse) bool {
@@ -61,12 +67,12 @@ func (m *MainWidget) HandleMouse(currentRect box.Rect, ev *tcell.EventMouse) boo
 func (m *MainWidget) HandleKey(ev *tcell.EventKey) bool {
 	if ev.Key() == tcell.KeyBS || ev.Key() == tcell.KeyDEL {
 		// Delete the character at the end
-		if len(m.label.Text) > 0 {
-			m.label.Text = m.label.Text[:len(m.label.Text)-1]
+		if len(m.text.Text) > 0 {
+			m.text.Text = m.text.Text[:len(m.text.Text)-1]
 		}
 	} else {
 		// Insert the typed character at the end
-		m.label.Text = string(append([]rune(m.label.Text), ev.Rune()))
+		m.text.Text = string(append([]rune(m.text.Text), ev.Rune()))
 	}
 	return true
 }
@@ -75,14 +81,15 @@ func (m *MainWidget) SetFocused(b bool) {
 	m.align.SetFocused(b)
 }
 
-func (m *MainWidget) DisplaySize(boundsW, boundsH int) (w, h int) {
-	return m.align.DisplaySize(boundsW, boundsH)
+func (m *MainWidget) Bounds(space box.Rect) box.Rect {
+	return m.align.Bounds(space)
 }
 
 func (m *MainWidget) Draw(rect box.Rect, s tcell.Screen) {
 	// Because the Align is set to Absolute positioning, we give it a position and size through m.align.Rect
-	// I cheat and directly access the align's child to know how big it plans to be, because the align will always
-	// return 0,0 for an absolute size (as expected)
-	m.align.Rect.W, m.align.Rect.H = m.align.Child.DisplaySize(rect.W-m.align.Rect.X, rect.H-m.align.Rect.Y)
+	// I directly access the align's child to know how big it plans to be, because the align will always
+	// return 0,0 for an absolute size.
+	space := rect.WithSize(rect.W-m.align.Rect.X, rect.H-m.align.Rect.Y)
+	m.align.Rect.W, m.align.Rect.H = m.align.Child.Bounds(space).Size()
 	m.align.Draw(rect, s)
 }

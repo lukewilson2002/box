@@ -28,18 +28,24 @@ type Window struct {
 	relativeCursorPosY int  // Cursor Y position when dragging became true
 }
 
+var _ box.Widget = (*Window)(nil)
+
 func (w *Window) Close() {
 	if w.OnClosed != nil {
 		w.OnClosed()
 	}
 }
 
-func (w *Window) GetChildRect(rect box.Rect) *box.Rect {
+func (w *Window) GetChildRect(rect box.Rect) box.Rect {
 	if w.Child != nil {
-		childW, childH := w.Child.DisplaySize(rect.W, rect.H-1)
-		return &box.Rect{rect.X, rect.Y + 1, childW, childH}
+		body := box.Rect{rect.X, rect.Y + 1, rect.W, rect.H - 1}
+		return w.Child.Bounds(body)
 	}
-	return nil
+	return rect.WithSize(10, 2) // Show part of the title and body
+}
+
+func (w *Window) GetChildren() []box.Widget {
+	return []box.Widget{w.Child}
 }
 
 func (w *Window) HandleMouse(rect box.Rect, ev *tcell.EventMouse) bool {
@@ -58,7 +64,7 @@ func (w *Window) HandleMouse(rect box.Rect, ev *tcell.EventMouse) bool {
 	}
 
 	if w.Child != nil {
-		if w.Child.HandleMouse(*w.GetChildRect(rect), ev) {
+		if w.Child.HandleMouse(w.GetChildRect(rect), ev) {
 			w.SetFocused(true)
 		}
 	}
@@ -85,7 +91,7 @@ func (w *Window) HandleMouse(rect box.Rect, ev *tcell.EventMouse) bool {
 			w.SetFocused(true) // We're definitely focused after being clicked on
 			//if w.Child != nil {
 			//	// Maybe the event was meant for our child
-			//	childW, childH := w.Child.DisplaySize(w.Rect.W, w.Rect.H)
+			//	childW, childH := w.Child.Bounds(w.Rect.W, w.Rect.H)
 			//	_ = w.Child.HandleMouse(Rect{w.Rect.X, w.Rect.Y, childW, childH}, ev)
 			//}
 			return true // Return true because we did "handle" the event regardless
@@ -107,8 +113,8 @@ func (w *Window) SetFocused(b bool) {
 	}
 }
 
-func (w *Window) DisplaySize(boundsW, boundsH int) (int, int) {
-	return boundsW, boundsH
+func (w *Window) Bounds(space box.Rect) box.Rect {
+	return space
 }
 
 func (w *Window) Draw(rect box.Rect, s tcell.Screen) {
@@ -128,6 +134,6 @@ func (w *Window) Draw(rect box.Rect, s tcell.Screen) {
 	}
 	// Draw child
 	if w.Child != nil {
-		w.Child.Draw(*w.GetChildRect(rect), s)
+		w.Child.Draw(w.GetChildRect(rect), s)
 	}
 }

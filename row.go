@@ -13,6 +13,8 @@ type Row struct {
 	focused       bool
 }
 
+var _ Widget = (*Row)(nil)
+
 func (r *Row) FocusNext() {
 	if len(r.Children) < 2 {
 		return
@@ -43,7 +45,8 @@ func (r *Row) GetChildRects(rect Rect) []Rect {
 		childWidthSum := 0
 		childMaxWidth := rect.W / childLen
 		for i := 0; i < childLen; i++ {
-			w, h := r.Children[i].DisplaySize(childMaxWidth, rect.H)
+			w, h := r.Children[i].
+				Bounds(rect.WithSize(childMaxWidth, rect.H)).Size()
 			var y int
 			switch r.VerticalAlign {
 			case AlignCenter:
@@ -81,6 +84,10 @@ func (r *Row) GetChildRects(rect Rect) []Rect {
 	return nil
 }
 
+func (r *Row) GetChildren() []Widget {
+	return r.Children
+}
+
 func (r *Row) HandleMouse(currentRect Rect, ev *tcell.EventMouse) bool {
 	rects := r.GetChildRects(currentRect)
 	for i := range r.Children {
@@ -112,10 +119,10 @@ func (r *Row) SetFocused(b bool) {
 	}
 }
 
-func (r *Row) DisplaySize(boundsW, boundsH int) (w, h int) {
-	rects := r.GetChildRects(Rect{0, 0, boundsW, boundsH})
+func (r *Row) Bounds(space Rect) Rect {
+	rects := r.GetChildRects(space)
 	if rects == nil {
-		return 0, 0
+		return space.WithSize(0, 0)
 	}
 	height := 0
 	width := 0
@@ -125,7 +132,7 @@ func (r *Row) DisplaySize(boundsW, boundsH int) (w, h int) {
 			height = rects[i].H // only the maximum height
 		}
 	}
-	return width, height
+	return space.WithSize(width, height)
 }
 
 func (r *Row) Draw(rect Rect, s tcell.Screen) {

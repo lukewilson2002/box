@@ -28,3 +28,14 @@ wrap actual Widget:
 struct BaseWidget:
   mutex
   innerWidget
+
+
+
+2025:
+
+ - [X] Add GetChildren()
+ - [X] Refactor DrawSize(boundsW, boundsH int) -> Bounds(space Rect)
+ - [ ] Refactor all Widget functions that take a (previously) currentRect to
+take a space Rect instead, for simplicity and control
+ - [ ] Panic catch at App.Run to prevent the terminal from being f-ed up by mid-rendering logic
+ - [ ] Rect.Expand and Contract (amt int)

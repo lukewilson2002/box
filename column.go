@@ -13,6 +13,8 @@ type Column struct {
 	focused         bool
 }
 
+var _ Widget = (*Column)(nil)
+
 func (c *Column) FocusNext() {
 	if len(c.Children) < 2 {
 		return
@@ -43,7 +45,8 @@ func (c *Column) GetChildRects(rect Rect) []Rect {
 		childHeightSum := 0
 		childMaxHeight := rect.H / childLen
 		for i := 0; i < childLen; i++ {
-			w, h := c.Children[i].DisplaySize(rect.W, childMaxHeight)
+			w, h := c.Children[i].
+				Bounds(rect.WithSize(rect.W, childMaxHeight)).Size()
 			var x int
 			switch c.HorizontalAlign {
 			case AlignCenter:
@@ -83,6 +86,10 @@ func (c *Column) GetChildRects(rect Rect) []Rect {
 	return nil
 }
 
+func (c *Column) GetChildren() []Widget {
+	return c.Children
+}
+
 func (c *Column) HandleMouse(currentRect Rect, ev *tcell.EventMouse) bool {
 	rects := c.GetChildRects(currentRect)
 	for i := range c.Children {
@@ -114,10 +121,10 @@ func (c *Column) SetFocused(b bool) {
 	}
 }
 
-func (c *Column) DisplaySize(boundsW, boundsH int) (w, h int) {
-	rects := c.GetChildRects(Rect{0, 0, boundsW, boundsH})
+func (c *Column) Bounds(space Rect) Rect {
+	rects := c.GetChildRects(space)
 	if rects == nil {
-		return 0, 0
+		return space.WithSize(0, 0)
 	}
 	height := 0
 	width := 0
@@ -127,7 +134,7 @@ func (c *Column) DisplaySize(boundsW, boundsH int) (w, h int) {
 			width = rects[i].W // only the maximum width
 		}
 	}
-	return width, height
+	return space.WithSize(width, height)
 }
 
 func (c *Column) Draw(rect Rect, s tcell.Screen) {

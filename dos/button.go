@@ -15,6 +15,12 @@ type Button struct {
 	focused      bool
 }
 
+func (b *Button) GetChildren() []box.Widget {
+	return nil
+}
+
+var _ box.Widget = (*Button)(nil)
+
 func (b *Button) Press() {
 	if b.OnPressed != nil {
 		b.OnPressed()
@@ -43,12 +49,12 @@ func (b *Button) SetFocused(v bool) {
 	b.focused = v
 }
 
-func (b *Button) DisplaySize(boundsW, boundsH int) (w, h int) {
-	return runewidth.StringWidth(b.Text) + 4, 1
+func (b *Button) Bounds(space box.Rect) box.Rect {
+	return space.WithSize(runewidth.StringWidth(b.Text)+4, 1)
 }
 
 func (b *Button) Draw(rect box.Rect, s tcell.Screen) {
-	w, _ := b.DisplaySize(rect.W, rect.H)
+	w := b.Bounds(rect).W
 
 	var style tcell.Style
 	if b.focused {

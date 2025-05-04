@@ -8,10 +8,16 @@ type Center struct {
 	Child Widget
 }
 
-func (c *Center) GetChildRect(currentRect Rect) Rect {
-	childWidth, childHeight := c.Child.DisplaySize(currentRect.W, currentRect.H)
-	x, y := currentRect.W/2-childWidth/2, currentRect.H/2-childHeight/2
-	return Rect{currentRect.X + x, currentRect.Y + y, childWidth, childHeight}
+var _ Widget = (*Center)(nil)
+
+func (c *Center) GetChildren() []Widget {
+	return []Widget{c.Child}
+}
+
+func (c *Center) GetChildRect(space Rect) Rect {
+	childRect := c.Child.Bounds(space)
+	x, y := space.W/2-childRect.W/2, space.H/2-childRect.H/2
+	return Rect{space.X + x, space.Y + y, childRect.W, childRect.H}
 }
 
 func (c *Center) HandleMouse(currentRect Rect, ev *tcell.EventMouse) bool {
@@ -36,8 +42,8 @@ func (c *Center) SetFocused(b bool) {
 	}
 }
 
-func (c *Center) DisplaySize(boundsW, boundsH int) (w, h int) {
-	return boundsW, boundsH
+func (c *Center) Bounds(space Rect) Rect {
+	return space
 }
 
 func (c *Center) Draw(rect Rect, s tcell.Screen) {

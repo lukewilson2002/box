@@ -13,6 +13,12 @@ type Shadow struct {
 	MakeSmall bool
 }
 
+var _ box.Widget = (*Shadow)(nil)
+
+func (s *Shadow) GetChildren() []box.Widget {
+	return []box.Widget{s.Child}
+}
+
 func (s *Shadow) HandleMouse(currentRect box.Rect, ev *tcell.EventMouse) bool {
 	if s.Child != nil {
 		return s.Child.HandleMouse(currentRect, ev)
@@ -33,11 +39,11 @@ func (s *Shadow) SetFocused(b bool) {
 	}
 }
 
-func (s *Shadow) DisplaySize(boundsW, boundsH int) (w, h int) {
+func (s *Shadow) Bounds(space box.Rect) box.Rect {
 	if s.Child != nil {
-		return s.Child.DisplaySize(boundsW, boundsH)
+		return s.Child.Bounds(space)
 	}
-	return 0, 0
+	return space.WithSize(0, 0)
 }
 
 func (s *Shadow) shadowCell(x, y int, screen tcell.Screen) (width int) {

@@ -21,6 +21,12 @@ type TextInput struct {
 	focused   bool
 }
 
+var _ box.Widget = (*TextInput)(nil)
+
+func (t *TextInput) GetChildren() []box.Widget {
+	return nil
+}
+
 func (t *TextInput) HandleMouse(currentRect box.Rect, ev *tcell.EventMouse) bool {
 	panic("implement me")
 }
@@ -33,7 +39,7 @@ func (t *TextInput) SetFocused(b bool) {
 	t.focused = b
 }
 
-func (t *TextInput) DisplaySize(boundsW, boundsH int) (w, h int) {
+func (t *TextInput) Bounds(space box.Rect) box.Rect {
 	panic("implement me")
 }
 
